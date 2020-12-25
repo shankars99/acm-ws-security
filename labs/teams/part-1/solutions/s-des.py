@@ -48,7 +48,7 @@ def key_gen(key):
     LS1_key = LS1(P10(key))
 
     key_1 = P8(LS1_key)
-    key_2 = P8(LS1(LS1(LS1_key)))
+    key_2 = P8(LS1(LS1_key))
 
     #print("Key-1:"+ key_1 +"\nKey-2:"+ key_2)
     return (key_1,key_2)
@@ -61,10 +61,13 @@ def encrypt_plain(plain_text):
     return(enc, dec)
 
 def f_key(enc_plain, SK):
-    R = enc_plain[:4]
-    L = enc_plain[4:]
+    L = enc_plain[:4]
+    R = enc_plain[4:]
     F = F_func(R, SK)
-    f = A_xor_B(L,F) + R
+    #print(L)
+    #print(R)
+    f = A_xor_B(L, SK) + R
+    #print(f)
     return f
 
 
@@ -113,15 +116,30 @@ def SW(key):
     return key_new
 
 
-key = "1010000010"
-plain_text_full = "01000110"
+option = input("\n1. Encode\n2. Decode\nEnter your option:")
+
+key = input("Enter the key:")
+inp = input("Enter the text:")
 
 key_1, key_2 = key_gen(key)
 #enc_plain, dec_plain = encrypt_plain(plain_text)
 
-plain_text = plain_text_full[:8]
-IP_1 = IP(plain_text)
-fk_1 = f_key(IP_1, key_1)
-switch = SW(fk_1)
-fk_2 = f_key(switch, key_2)
-IP_2 = IP_inv(fk_2)
+if option == '1':
+    print()
+    IP_1 = IP(inp)
+    fk_1 = f_key(IP_1, key_1)
+    switch = SW(fk_1)
+    fk_2 = f_key(switch, key_2)
+    IP_2 = IP_inv(fk_2)
+
+    print("\nEncoded = " + IP_2)
+else:
+    print()
+    plain_text = inp
+    IP_1 = IP(plain_text)
+    fk_2 = f_key(IP_1, key_2)
+    switch = SW(fk_2)
+    fk_1 = f_key(switch, key_1)
+    IP_2 = IP_inv(fk_1)
+
+    print("\nDecoded = " + IP_2)

@@ -1,5 +1,6 @@
 
-def s_box_transposition(inp_box, order, order_name = "S-Box"):
+def s_box_transposition(inp_box, order, order_name):
+
     new_inp = [ [],[] ]
 
     for row in range(len(inp_box)):
@@ -30,13 +31,16 @@ def MC_box_transposition(inp_box, MC_box_order, order_name = "MC"):
     transpose_display(order_name, MC_new_box)
     return(MC_new_box)
 
-def s_box(inp_box):
+def get_s_box():
     s_box_order = ["1001", "0100", "1010", "1011",
                    "1101", "0001", "1000", "0101",
                    "0110", "0010", "0000", "0011",
                    "1100", "1110", "1111", "0111"]
+    return s_box_order
 
-    s_box_key = s_box_transposition(inp_box, s_box_order)
+def s_box(inp_box, inp_name = "S-Box"):
+    s_box_order = get_s_box()
+    s_box_key = s_box_transposition(inp_box, s_box_order, inp_name)
     return s_box_key
 
 def SR(inp):
@@ -59,10 +63,105 @@ def transpose_display(order_name, inp_box):
         print(row)
     print()
 
+def SN(inp_box):
+    SN_box = get_s_box()
+    new_inp = []
+    for char in range(len(inp_box)):
+        val = int(inp_box[char], 2)
+        new_inp.append(SN_box[val])
+    print("\nSN:")
+    print(new_inp)
+    return(new_inp)
+
+def key_gen(key):
+    w = [ [key[0], key[1]], [key[2], key[3]] , []]
+    keys = [ key[0]+key[1], "", "" ]
+
+    r_con = [["1000", "0000"],[ "0011","0000"] ]
+
+    w_new = SR(w)
+
+    sn = SN(w_new[1])
+
+    print("\nRound constant")
+    y = RC(sn, r_con[0])
+
+    print("\nW0 ^ W2")
+    y = t = RC(w_new[0], y)
+    keys[1] = keys[1].join(y)
+
+    print("\nW1 ^ W3")
+    y = q = RC(sn,y)
+    w[2] = y
+    keys[0] = keys[0] + "".join(sn)
+    keys[1] = keys[1] + "".join(y)
+
+    w[0] = w[1]
+    w[1] = w[2]
+    w_new = SR(w)
+
+    sn = SN(w_new[1])
+
+    print("\nRound constant")
+    y = RC(sn, r_con[1])
+
+    print("\nW2 ^ W4")
+    y = RC(y, t)
+    keys[2] = "".join(y)
+
+    print("\nW3 ^ W5")
+    print(q[::-1])
+    y = RC(q[::-1], y)
+    keys[2] = keys[2] + "".join(y)
+
+    print("\nKeys = ")
+    print(keys)
+
+    return keys
+
+def RC(x, r_con):
+    rc = [A_xor_B(x[0], r_con[0]), A_xor_B(x[1], r_con[1])]
+    #print("\nRC = ")
+    print(rc)
+    return rc
+
+def A_xor_B(A, B):
+    bit_xor = ""
+    for i in range(len(A)):
+        bit_xor += str(int(A[i]) ^ int(B[i]))
+    #print(bit_xor)
+    return bit_xor
+
+def key_to_list(key):
+    key_list = [key[:4], key[8:12], key[4:8], key[12:16]]
+    print(key_list)
+    return key_list
+
+def list_xor(A, B):
+    res = [[],[]]
+    for i in range(4):
+        #print(A[i//2][i%2] + "^" + B[i])
+        res[i//2].append(A_xor_B(A[i//2][i % 2], B[i]))
+    return res
+
+def enc(inp, keys):
+    AK1 = list_xor(inp, key_to_list(keys[0]) )
+    print(AK1)
+    inp = s_box(AK1)
+    inp = SR(inp)
+    inp = MC(inp)
+
+    AK2 = list_xor(inp, key_to_list(keys[1]))
+    print(AK2)
+    inp = s_box(AK2)
+    inp = SR(inp)
+
+    AK3 = list_xor(inp, key_to_list(keys[2]))
+    print(AK3)
 
 
-inp = [ ["1100","0101"], ["1000","0000"] ]
+key = ["1010", "0111", "0011", "1011"]
+inp = [["0110", "1111"], ["0110", "1011"]]
+keys = key_gen(key)
 
-inp = s_box(inp)
-inp = SR(inp)
-MC(inp)
+enc(inp,keys)

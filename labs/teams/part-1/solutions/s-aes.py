@@ -157,11 +157,13 @@ def enc(inp, keys):
     inp = SR(inp)
 
     AK3 = list_xor(inp, key_to_list(keys[2]))
-    print(AK3)
+    print("Encoded")
+    for row in AK3:
+        print(row)
 
 
 key = ["1010", "0111", "0011", "1011"]
-inp = [["0110", "1111"], ["0110", "1011"]]
+inp = [["0110", "0110"], ["1111", "1011"]]
 keys = key_gen(key)
 
 enc(inp,keys)

@@ -144,12 +144,34 @@ def list_xor(A, B):
         res[i//2].append(A_xor_B(A[i//2][i % 2], B[i]))
     return res
 
-def MC_inv():
+def get_MC_inv():
     MC_box_order = [["2", "4", "6", "8", "A", "C", "E", "3", "1", "7", "5", "B", "9", "F", "D"],
                     ['4', '8', 'C', '3', '7', 'B', 'F', '6', '2', 'E', 'A', '5', '1', 'D', '9'],
                     ['9', '1', '8', '2', 'B', '3', 'A', '4', 'D', '5', 'C', '6', 'F', '7', 'E']]
-    
     return MC_box_order
+
+def MC_inv(inp):
+    MC_box_order = get_MC_inv()
+    #inp = [['1111', '0011'], ['0110', '0011']]
+    MC_inv_mat = [2,0,0,2]
+    inp_inv = [[],[]]
+    term_1 =[int(inp[0][0], 2)-1, int(inp[0][1], 2)-1, int(inp[1][0], 2)-1, int(inp[1][1], 2)-1]
+    for j in range(2):
+        for i in range(2):
+            x = MC_box_order[MC_inv_mat[i]][term_1[j]]
+            y = MC_box_order[MC_inv_mat[2+i]][term_1[2+j]]
+            inp_inv[i].append(A_xor_B( get_bin(x),get_bin(y ) ))
+            #print(get_bin(x) +"XOR"+ get_bin(y))
+    return(inp_inv)
+
+def get_bin(x):
+    return bin(int(x,16))[2:].zfill(4)
+
+def SN_inv(inp):
+    sn_inv = {9: '0000', 4: '0001', 10: '0010', 11: '0011', 13: '0100', 1: '0101', 8: '0110', 5: '0111', 6: '1000', 2: '1001', 0: '1010', 3: '1011', 12: '1100', 14: '1101', 15: '1110', 7: '1111', '1001': '0', '0100': '1',
+         '1010': '10', '1011': '11', '1101': '100', '0001': '101', '1000': '110', '0101': '111', '0110': '1000', '0010': '1001', '0000': '1010', '0011': '1011', '1100': '1100', '1110': '1101', '1111': '1110', '0111': '1111'}
+    out = s_box_transposition(inp, sn_inv, "SN_inv")
+    return out
 
 def enc(inp, keys):
     AK1 = list_xor(inp, key_to_list(keys[0]) )
@@ -164,13 +186,42 @@ def enc(inp, keys):
     inp = SR(inp)
 
     AK3 = list_xor(inp, key_to_list(keys[2]))
-    print("Encoded")
+    print("\nEncoded")
     for row in AK3:
+        print(row) 
+    return AK3
+
+def dec(inp, keys):
+    AK3 = list_xor(inp, key_to_list(keys[2]))
+    inp = SR(AK3)
+    inp = SN_inv(inp)
+    AK2 = list_xor(inp, key_to_list(keys[1]))
+    inp = MC_inv(AK2)
+    inp = SR(inp)
+    inp = SN_inv(inp)
+    AK1 = list_xor(inp, key_to_list(keys[0]))
+    print("\nDecoded")
+    for row in AK1:
         print(row)
+    return AK1
 
 
-key = ["1010", "0111", "0011", "1011"]
-inp = [["0110", "0110"], ["1111", "1011"]]
+#key = ["1010", "0111", "0011", "1011"]
+#inp = [["0110", "0110"], ["1111", "1011"]]
+
+inp = input("Enter the text:").split()
+key = input("Enter the key:").split()
+option = input("1.Encode\n2.Decode\nEnter the option")
+
+inp = [ [inp[0], inp[2]], [inp[1], inp[3]]]
 keys = key_gen(key)
 
-enc(inp,keys)
+if option == '1':
+    enc(inp,keys)
+else:
+    dec(inp,keys)
+    '''
+Enter the text: 0000 0011 0111 1000
+Enter the key: 1010 0111 0011 1011
+
+'''

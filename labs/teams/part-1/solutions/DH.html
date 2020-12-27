@@ -1,0 +1,29 @@
+<html>
+
+<body>
+    <script>
+        function KeyGen() {
+            base = document.getElementById("base").value;
+            modulo = document.getElementById("modulo").value;
+            exponent = document.getElementById("exponent").value;
+
+            var result = 1;
+            while (exponent > 0) {
+                if (exponent % 2 == 1) {
+                    result = (result * base) % modulo;
+                }
+                base = (base * base) % modulo;
+                exponent = exponent >>> 1;
+            }
+            console.log(result);
+            return "result";
+        }
+    </script>
+    <label>Base:<input id="base" value="3"></label><br>
+    <label>Exponent:<input id="exponent" value="12323234623423452345"></label><br>
+    <label>Modulo:<input id="modulo" value="1222342342345234523"></label><br>
+    <input type="button" value="Compute" onclick="KeyGen()"><br>
+    Result: <input id="result">
+</body>
+
+</html>

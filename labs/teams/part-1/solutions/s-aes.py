@@ -144,6 +144,13 @@ def list_xor(A, B):
         res[i//2].append(A_xor_B(A[i//2][i % 2], B[i]))
     return res
 
+def MC_inv():
+    MC_box_order = [["2", "4", "6", "8", "A", "C", "E", "3", "1", "7", "5", "B", "9", "F", "D"],
+                    ['4', '8', 'C', '3', '7', 'B', 'F', '6', '2', 'E', 'A', '5', '1', 'D', '9'],
+                    ['9', '1', '8', '2', 'B', '3', 'A', '4', 'D', '5', 'C', '6', 'F', '7', 'E']]
+    
+    return MC_box_order
+
 def enc(inp, keys):
     AK1 = list_xor(inp, key_to_list(keys[0]) )
     print(AK1)

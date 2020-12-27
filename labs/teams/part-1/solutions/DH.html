@@ -1,7 +1,7 @@
 <html>
 
-<body>
     <script>
+        document.getElementById("Compute").onclick = function () { KeyGen() };
         function KeyGen() {
             base = document.getElementById("base").value;
             modulo = document.getElementById("modulo").value;
@@ -16,14 +16,15 @@
                 exponent = exponent >>> 1;
             }
             console.log(result);
-            return "result";
+            document.getElementById("result").innerHTML = result
         }
     </script>
+<body>
     <label>Base:<input id="base" value="3"></label><br>
     <label>Exponent:<input id="exponent" value="12323234623423452345"></label><br>
     <label>Modulo:<input id="modulo" value="1222342342345234523"></label><br>
     <input type="button" value="Compute" onclick="KeyGen()"><br>
-    Result: <input id="result">
+    Result: <span id = "result"></span>
 </body>
 
 </html>
